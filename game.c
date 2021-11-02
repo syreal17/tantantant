@@ -30,6 +30,7 @@ int main (int argc, char *argv[])
   bool player_a = false;
   bool player_n = false;
   bool player_t = false;
+  bool player_wiggle = false;
   
   while(run)
   {
@@ -45,7 +46,14 @@ int main (int argc, char *argv[])
     // Drawing player
     mvprintw(player.y, player.x,   " \\()/ ");
     mvprintw(player.y+1, player.x, " -<>- ");
-    mvprintw(player.y+2, player.x, " /( )\\");
+    if( player_wiggle == true )
+    {
+      mvprintw(player.y+2, player.x, " /( )\\");
+    }
+    else
+    {
+      mvprintw(player.y+2, player.x, "/( )\\ ");
+    }
     // Refresh drawing
     refresh();
     
@@ -81,6 +89,7 @@ int main (int argc, char *argv[])
       player_a = false;
       player_n = false;
       player_t = false;
+      player_wiggle = !player_wiggle;
     }
   }
   
