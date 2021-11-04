@@ -1,10 +1,9 @@
 .PHONY: main
-main: clean game
+main: game
 
 
 game: game.c
-	gcc -o game game.c -lcurses
-	strip -s game
+	gcc -o game game.c -lcurses -lpthread
 
 
 game.c:
@@ -12,7 +11,7 @@ game.c:
 
 
 game-dev:
-	gcc -g -o game game.c -lcurses
+	gcc -g -o game game.c -lcurses -lpthread
 
 clean:
 	rm -f game
