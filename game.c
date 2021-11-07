@@ -31,6 +31,7 @@ void *keypressThread(void *vargp)
   
   while(run)
   {
+    // Key handler
     k = getch();
     
     if( k == 'Q' )
@@ -60,6 +61,33 @@ void *keypressThread(void *vargp)
         player_t = true;
         pthread_mutex_unlock(&lock);
       }
+    }
+    
+    // Player movement
+    if( player_a && player_n && player_t )
+    {
+      pthread_mutex_lock(&lock);
+      player.y -= 1;
+      player_a = false;
+      player_n = false;
+      player_t = false;
+      player_wiggle = !player_wiggle;
+      pthread_mutex_unlock(&lock);
+      
+      // Re-drawing player
+      mvprintw(player.y, player.x,   ".\\()/.");
+      mvprintw(player.y+1, player.x, ".-<>-.");
+      if( player_wiggle == true )
+      {
+        mvprintw(player.y+2, player.x, "./(_)\\");
+      }
+      else
+      {
+        mvprintw(player.y+2, player.x, "/(_)\\.");
+      }
+      mvprintw(player.y+3, player.x, "......");
+      
+      refresh();
     }
   }
   
@@ -92,40 +120,35 @@ int main (int argc, char *argv[])
   }
   
   
+  // Drawing base layer
+  for( int y = 0; y < max_y; y++ )
+  {
+   for( int x = 0; x < max_x; x++ )
+    {
+      mvprintw(y, x, ".");
+    }
+  }
+  
+  // Initial player drawing
+  mvprintw(player.y, player.x,   ".\\()/.");
+  mvprintw(player.y+1, player.x, ".-<>-.");
+  if( player_wiggle == true )
+  {
+    mvprintw(player.y+2, player.x, "./(_)\\");
+  }
+  else
+  {
+    mvprintw(player.y+2, player.x, "/(_)\\.");
+  }
+  
+  // Refresh drawing
+  refresh();
+  
+  
+  // TODO : Use this for opponent
   while(run)
   {
-    if( player_a && player_n && player_t )
-    {
-      player.y -= 1;
-      player_a = false;
-      player_n = false;
-      player_t = false;
-      player_wiggle = !player_wiggle;
-    }
-  
-    // Drawing base layer
-    for( int y = 0; y < max_y; y++ )
-    {
-      for( int x = 0; x < max_x; x++ )
-      {
-        mvprintw(y, x, ".");
-      }
-    }
     
-    // Drawing player
-    mvprintw(player.y, player.x,   " \\()/ ");
-    mvprintw(player.y+1, player.x, " -<>- ");
-    if( player_wiggle == true )
-    {
-      mvprintw(player.y+2, player.x, " /( )\\");
-    }
-    else
-    {
-      mvprintw(player.y+2, player.x, "/( )\\ ");
-    }
-    
-    // Refresh drawing
-    refresh();
   }
   
   pthread_mutex_destroy(&lock);
