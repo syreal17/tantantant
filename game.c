@@ -4,10 +4,42 @@
 #include <curses.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <time.h>
+#include <errno.h>
+
+
+
+
+/* msleep(): Sleep for the requested number of milliseconds. */
+int msleep(long msec)
+{
+  struct timespec ts;
+  int res;
+
+  if (msec < 0)
+  {
+    errno = EINVAL;
+    return -1;
+  }
+
+  ts.tv_sec = msec / 1000;
+  ts.tv_nsec = (msec % 1000) * 1000000;
+
+  do {
+    res = nanosleep(&ts, &ts);
+  } while (res && errno == EINTR);
+
+  return res;
+}
 
 
 
 struct Player
+{
+  int x, y;
+};
+
+struct Opponent
 {
   int x, y;
 };
@@ -20,6 +52,7 @@ bool player_a = false;
 bool player_n = false;
 bool player_t = false;
 bool player_wiggle = false;
+struct Opponent opponent = {0, 0};
 
 pthread_mutex_t lock;
 
@@ -108,6 +141,8 @@ int main (int argc, char *argv[])
   curs_set(FALSE);
   player.x = max_x / 3;
   player.y = max_y - 3;
+  opponent.x = 2*max_x / 3;
+  opponent.y = max_y - 3;
   
   
   pthread_t thread_id;
@@ -141,14 +176,27 @@ int main (int argc, char *argv[])
     mvprintw(player.y+2, player.x, "/(_)\\.");
   }
   
+  // Initial opponent drawing
+  mvprintw(opponent.y, opponent.x,   "(=)");
+  mvprintw(opponent.y+1, opponent.x, "( )");
+  mvprintw(opponent.y+2, opponent.x, "(_)");
+
+  
   // Refresh drawing
   refresh();
   
   
-  // TODO : Use this for opponent
+  // Opponent movement
   while(run)
   {
+    msleep(1000);
+    opponent.y -= 1;
+    mvprintw(opponent.y, opponent.x,   "(=)");
+    mvprintw(opponent.y+1, opponent.x, "( )");
+    mvprintw(opponent.y+2, opponent.x, "(_)");
+    mvprintw(opponent.y+3, opponent.x, "...");
     
+    refresh();
   }
   
   pthread_mutex_destroy(&lock);
