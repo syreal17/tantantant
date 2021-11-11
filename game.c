@@ -48,9 +48,9 @@ struct Opponent
 
 bool run = TRUE;
 struct Player player = {0, 0};
-bool player_a = false;
-bool player_n = false;
-bool player_t = false;
+bool player_b = false;
+bool player_u = false;
+bool player_g = false;
 bool player_wiggle = false;
 struct Opponent opponent = {0, 0};
 
@@ -71,39 +71,39 @@ void *keypressThread(void *vargp)
     {
       run = FALSE;
     }
-    else if( k == 'a' )
+    else if( k == 'b' )
     {
       pthread_mutex_lock(&lock);
-      player_a = true;
+      player_b = true;
       pthread_mutex_unlock(&lock);
     }
-    else if( k == 'n' )
+    else if( k == 'u' )
     {
-      if( player_a )
+      if( player_b )
       {
         pthread_mutex_lock(&lock);
-        player_n = true;
+        player_u = true;
         pthread_mutex_unlock(&lock);
       }
     }
-    else if( k == 't' )
+    else if( k == 'g' )
     {
-      if( player_a && player_n )
+      if( player_b && player_u )
       {
         pthread_mutex_lock(&lock);
-        player_t = true;
+        player_g = true;
         pthread_mutex_unlock(&lock);
       }
     }
     
     // Player movement
-    if( player_a && player_n && player_t )
+    if( player_b && player_u && player_g )
     {
       pthread_mutex_lock(&lock);
       player.y -= 1;
-      player_a = false;
-      player_n = false;
-      player_t = false;
+      player_b = false;
+      player_u = false;
+      player_g = false;
       player_wiggle = !player_wiggle;
       pthread_mutex_unlock(&lock);
       
